@@ -1,0 +1,6 @@
+
+To view the tremor_app api documentation:
+
+1. Go to editor.swagger.io website.
+2. Go to file -> import file -> choose file -> 	click on import button
+3. Finally, you can see the document

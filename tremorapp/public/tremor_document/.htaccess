@@ -1,0 +1,8 @@
+//Password Protect file
+<Files tremor_document>
+AuthName "Documentation"
+AuthType Basic
+AuthUserFile /var/www/projects/tremorapp/public/tremor_document/web/.htpasswd
+Require valid-user
+</Files>
+ 

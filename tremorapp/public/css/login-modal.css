@@ -1,0 +1,32 @@
+/*
+| Purpose:
+| Author: mfsi-krishnadev;
+*/
+.modal {
+   position: absolute;
+   top: 100px;
+   right: 100px;
+   bottom: 0;
+   left: 0;
+   z-index: 10040;
+   overflow: auto;
+   overflow-y: auto;
+}
+
+#pop-modal {
+    display:none;
+}
+
+@media screen and (min-width: 768px) {
+        .modal-dialog {
+          width: 50%; /* New width for default modal */
+        }
+        .modal-sm {
+          width: 350px; /* New width for small modal */
+        }
+    }
+    @media screen and (min-width: 992px) {
+        .modal-lg {
+          width: 950px; /* New width for large modal */
+        }
+    }

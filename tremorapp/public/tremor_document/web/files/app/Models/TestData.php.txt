@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Exception;
+use DB;
+
+/**
+ * Model for test_data table
+ * @access public
+ * @package App\Http\Controllers
+ * @subpackage void
+ * @category void
+ * @author mfsi-krishnadev
+ * @link void
+ */
+
+class TestData extends Model
+{
+
+    // Defining the table name of the model
+    protected $table= 'test_data';
+    public $timestamps = false;
+
+    /**
+     * Function to insert the test results
+     *
+     * @param: accelerometer data
+     * @param: test id
+     * @return: integer
+     */
+    public static function insertTestResult($data)
+    {
+        try
+        {              
+            // $accelerationData = $data['accelerationData'];
+            $deltaT = 0;
+
+            $insertData = array();
+            $i = 0;
+
+            foreach ($data['accelerationData'] as $index => $acc_data)
+            {
+                $insertData[$index] = array(
+                    'test_id' => $data['test_id'],
+                    'accel_x' => $acc_data['x'],
+                    'accel_y' => $acc_data['y'],
+                    'accel_z' => $acc_data['z'],
+                    't' => ($index == 0) ? 0: ($deltaT + round($acc_data['t'] * 1000))
+                );
+
+                if ( $index != 0 )
+                {
+                    $deltaT += round($acc_data['t'] * 1000);
+                }
+            }
+
+            if ( ! empty($insertData))
+            {
+                // Return 1 after inserting
+                return TestData::insert($insertData);
+            }
+
+            throw new QueryException("Error occured while inserting test data");
+        }
+        catch ( \Exception $e)
+        {
+            // Log error
+            errorReporting($e);
+
+            // Return false on error occured
+            return 0;
+        }
+    }
+}

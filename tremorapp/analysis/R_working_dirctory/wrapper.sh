@@ -1,0 +1,1 @@
+Rscript wrapper.R /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/acceleration2.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/postUser.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/ /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/FinalData/ > wrapper.batch

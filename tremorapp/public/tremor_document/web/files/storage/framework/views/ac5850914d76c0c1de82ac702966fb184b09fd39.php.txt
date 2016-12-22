@@ -1,0 +1,76 @@
+<?php $__env->startSection('title', 'Report'); ?>
+
+<?php $__env->startSection('css'); ?>
+<link rel="stylesheet" href="<?php echo e(url('css/login-modal.css')); ?>">
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="container">
+    <div class="row row-centered">
+        <div class="col-xs-6 col-centered">
+            <a href="#" id="pop-modal">Medical Report</a>
+            <br><br>
+        </div>
+    </div>
+</div>
+
+<!-- Report Login Download Modal -->
+<div class="modal fade" id="login" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        
+        <!-- Modal Content -->
+        <div class="modal-content">
+            <?php echo e(Form::open(array(
+                'url' => route("getReport"), 
+                'method' => 'POST', 
+                'class' => 'form-horizontal', 
+                'id' => 'getReport', 
+                'data-validurl' => route("downloadReport"), 
+            ))); ?>
+
+                <div class="modal-header">
+                    <p><strong id="heading">Enter your Pin Number</strong></p>
+                </div>
+                <div class="modal-body" >
+                    <div class="pin-error-ctr">
+
+                    </div>
+                    <div class="form-group">
+                        <?php echo e(Form::label('pin', 'PIN:', array('class' => 'control-label col-sm-3'))); ?>
+
+                        <div class="col-sm-6">
+                            <?php echo e(Form::text('pin', null, array('class' => 'form-control'))); ?>
+
+                        </div>                        
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-6">
+                            <p><strong><u>Forgot Pin!</u></strong><br>
+                                Please contact <a href="#">support@mytremor.org</a></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Add hashId and token Id in hidden field -->
+                <?php echo e(Form::hidden('tokenId', $url['tokenId'])); ?>
+
+                <?php echo e(Form::hidden('hashId', $url['hashId'])); ?>
+
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-default btn-submit">Submit</button>
+                    <!--<button type="button" class="btn btn-success btn-closed-tab hidden">Close</button>-->
+                </div>
+            <?php echo e(Form::close()); ?>
+
+        </div>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('js'); ?>
+<script src="<?php echo e(url('js/report-popup.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.template', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

@@ -1,0 +1,129 @@
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Exception;
+use DB;
+
+/**
+ * Model for users table
+ * @access public
+ * @package App\Http\Controllers
+ * @subpackage void
+ * @category void
+ * @author mfsi-krishnadev
+ * @link void
+ */
+
+class User extends Model
+{
+    /** Defining the table name of the model */
+    protected $table= 'users';
+
+    /**
+     * Function to insert user data
+     * 
+     * @param: array
+     * @return: integer
+     */
+    public static function insertUsers($data)
+    {
+        try
+        {
+            // Begin database transaction
+            DB::beginTransaction();
+
+            // Instantiate User class
+            $objUser = new User();
+
+            // Hash the number retured by generate number functions returns
+            $haskKey = md5(generateNumber());
+
+            // Update user table with sign details
+            $objUser->first_name = $data['first_name'];
+            $objUser->last_name = $data['last_name'];
+            $objUser->gender = $data['gender'];
+            $objUser->dob = $data['dob'];
+            $objUser->height = $data['height'];
+            $objUser->weight = $data['weight'];
+            $objUser->city = $data['city'];
+            $objUser->state = $data['state'];
+            $objUser->ethnicity = $data['ethnicity'];
+            $objUser->pin = $data['pin'];
+            $objUser->ET = booleanToInt($data['ET']);
+            $objUser->PD = booleanToInt($data['PD']);
+            $objUser->other = $data['other'];
+            $objUser->tremor = booleanToInt($data['tremor']);
+            $objUser->personal_email = isset( $data['personal_email'] ) ? $data['personal_email'] : '';
+            $objUser->doctors_email = isset( $data['doctors_email'] ) ? $data['doctors_email'] : '';
+            $objUser->research_org_email = isset( $data['research_org'] ) ? $data['research_org'] : '';
+            $objUser->acceleration_unit = isset($data['acceleration_unit']) ? $data['acceleration_unit'] : 'SI';
+            $objUser->hash_key = $haskKey;
+
+            $userSuccess = $objUser->save();
+
+            // Get the user-id and hash key from table
+            $data = array(
+                $objUser->id,
+                $objUser->hash_key
+            );
+
+            // Throw exception if users table failed to update
+            if ( ! $userSuccess )
+            {
+                throw new QueryException("Error occured while updating users table");
+            }
+
+            // Commit database transaction
+            DB::commit();
+
+            // Return data
+            return $data;
+        }
+        catch ( Exception $e )
+        {
+            // Logging error
+            errorReporting($e);
+
+            // Rollback the database transaction
+            DB::rollback();
+
+            // Return false for error occured
+            return 0;
+        }
+    }
+
+    /**
+     * Function to update the test complete column
+     * 
+     * @param: array
+     * @return: integer
+     */
+    public static function updateTestComplete($data)
+    {
+        try
+        {
+            // Update test complete column wrt token
+            $updateTestComplete = User::where('id', $data['token'])
+                ->update(['test_complete' => $data['test_complete']]);
+
+            // If update is successful, return 1
+            if ( $updateTestComplete )
+            {
+                return $updateTestComplete;
+            }
+
+            // Throw exception for failed query execution
+            throw new QueryException("Database Error : Failed to update test complete.");
+
+        }
+        catch( Exception $e)
+        {
+            // Report error
+            errorReporting($e);
+
+            // Return zero as error occured
+            return 0;
+        }
+    }
+}

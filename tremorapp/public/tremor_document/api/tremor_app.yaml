@@ -1,0 +1,290 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "1.0.0"
+  title: Tremor App Api
+# the domain of the service
+host: mytremor.org
+
+# Describe your paths here
+paths:
+  # This is a path endpoint. Change it.
+  /users:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Submit the users sign-up data and return
+        hash key and token
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: app_id
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: first_name
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: last_name
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: gender
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: dob
+          in: query
+          description: date
+          required: true
+          type: string
+          format: date
+        -
+          name: pin
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: height
+          in: query
+          description: float
+          required: true
+          type: number
+          format: float
+        -
+          name: weight
+          in: query
+          description: float
+          required: true
+          type: number
+          format: float
+        -
+          name: city
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: state
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: ethnicity
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: ET
+          in: query
+          description: boolean
+          required: true
+          type: boolean
+          format: boolean
+        -
+          name: PD
+          in: query
+          description: boolean
+          required: true
+          type: boolean
+          format: boolean
+        -
+          name: other
+          in: query
+          description: integer
+          required: false
+          type: string
+          format: string
+        -
+          name: tremor
+          in: query
+          description: boolean
+          required: true
+          type: boolean
+          format: boolean
+        -
+          name: personal_email
+          in: query
+          description: string
+          required: false
+          type: string
+          format: string
+        -
+          name: doctors_email
+          in: query
+          description: string
+          required: false
+          type: string
+          format: string
+        -
+          name: research_org
+          in: query
+          description: string
+          required: false
+          type: string
+          format: string
+        -
+          name: acceleration_unit
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: users
+            type: array
+            items:
+              title: users
+              type: object
+              properties:
+                token:
+                  type: string
+                hash_key:
+                  type: string
+                message:
+                  type: string
+        # Response code
+        400:
+          description: Failure response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: users
+            type: array
+            items:
+              title: users
+              type: object
+              properties:
+                error:
+                  type: string
+                response:
+                  type: string
+  
+  /data:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Submit the test data of the users
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: app_id
+          in: query
+          description: hash_key + token
+          required: true
+          type: string
+          format: string
+        -
+          name: token
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: posture
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: ordinal
+          in: query
+          description: string
+          required: true
+          type: string
+          format: string
+        -
+          name: start_time
+          in: query
+          description: date
+          required: true
+          type: string
+          format: date
+        -
+          name: test_complete
+          in: query
+          description: boolean
+          required: true
+          type: boolean
+          format: boolean
+        -
+          name: acceleration_data
+          in: query
+          description: array
+          required: true
+          type: number
+          format: float
+
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: data
+            type: array
+            items:
+              title: data
+              type: object
+              properties:
+                message:
+                  type: string
+                response:
+                  type: number
+        # Response code
+        400:
+          description: Failure response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: data
+            type: array
+            items:
+              title: data
+              type: object
+              properties:
+                error:
+                  type: number
+                message:
+                  type: string              

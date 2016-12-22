@@ -1,0 +1,13 @@
+ 
+
+<?php $__env->startSection('title', 'Not Allowed'); ?>
+
+
+<?php $__env->startSection('content'); ?>
+<div class="title">Not Allowed</div>
+
+<div class="sub-header">
+    You're not allowed.
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.err-layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

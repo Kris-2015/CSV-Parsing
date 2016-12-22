@@ -1,0 +1,12 @@
+<?php $__env->startSection('Download', 'title'); ?>
+
+<?php $__env->startSection('download'); ?>
+	<?php if( Session::has('download.on.next')): ?>
+		<meta http-equiv="refresh" content="5;url=<?php echo e(Session::get('download.on.next')); ?>">
+	<?php endif; ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
+<h1>Trying to perform download operation</h1>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.template', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

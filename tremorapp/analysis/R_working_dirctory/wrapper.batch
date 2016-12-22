@@ -1,0 +1,175 @@
+> # Load tools for filename and MySQL methods
+> library(tools)
+> library('RMySQL')
+> args <- commandArgs(trailingOnly = TRUE)
+> # test if there are the correct number of arguments: if not, return an error
+> if (length(args)!=4) {
++   stop("Four arguments must be supplied (input_data, input_user files, output directory and final output directory).n", call.=FALSE)
++ }
+> print(args)
+[1] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/acceleration2.csv"
+[2] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/postUser.csv"     
+[3] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/"                 
+[4] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/FinalData/"       
+> 
+> input_data_file <- args[1]
+> input_user_file <- args[2]
+> output_directory <- args[3]
+> final_output_directory <- args[4]
+> 
+> # open a database connection
+> mydb = dbConnect(RMySQL::MySQL(), user='root', password='IiPjRf9kzaXNSdlNjQVA', dbname='tremor_app_stage', host='127.0.0.1')
+> 
+> # check for files in accel.R's output folder (full.names = TRUE would prepend the path to the filename)
+> filenames <- list.files(output_directory, pattern="*.pdf", full.names=FALSE)
+> print(filenames)
+[1] "93.pdf"
+> # if there are files in accel.R's output folder, move it to final resting place + put entry in Reports table of db
+> if (length(filenames) > 0){
++ 	# filenames is a List; just take the first one, move it to the final output dir and insert it in Reports table
++ 	final_output_file_path = paste(final_output_directory, filenames[[1]],sep="")
++ 	print(final_output_file_path)
++ 	file.rename(paste(output_directory, filenames[[1]],sep=""), final_output_file_path )
++ 	# from tools library...the file exported from accel.R is {id_user}.pdf
++ 	id_user <- file_path_sans_ext(filenames[[1]])
++ 	print(id_user)
++ 	now <- as.POSIXlt(Sys.time())
++ 	now.str <- format(now,'%Y-%m-%d %H:%M:%S')
++ 	print(now.str)
++ 	query <- paste("INSERT INTO reports(user_id, uri, created_at) VALUES('",id_user, "','", final_output_file_path, "','",now.str,"')")
++ 	print(query)
++ 	# The insert query seems to return an empty data frame, so we can't see if it worked or not
++ 	dbGetQuery(mydb, query)
++ }
+[1] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/FinalData/93.pdf"
+[1] "93"
+[1] "2016-11-09 04:50:03"
+[1] "INSERT INTO reports(user_id, uri, created_at) VALUES(' 93 ',' /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/FinalData/93.pdf ',' 2016-11-09 04:50:03 ')"
+NULL
+> 
+> # Now check if there's any new data to analyze (checks if test_complete = 1 but there's no report)
+> query <- "select u.id from users u where u.test_complete = 1 and u.id NOT IN (SELECT u.id FROM users u JOIN reports r ON u.id = r.user_id WHERE u.test_complete = 1)"
+> suppressWarnings(completed_users <- dbGetQuery(mydb, query))
+> head(completed_users)
+   id
+1  95
+2 117
+3 122
+4 123
+5 124
+6 125
+> 
+> if (!(is.data.frame(completed_users)) || nrow(completed_users)==0){
++ 	stop("No new data to analyze.n", call.=FALSE)
++ }
+> # OK, we have something to do, let's do it!
+> 
+> # Get the test data for the first user
+> query<-paste("select t.user_id, t.posture, t.ordinal, td.accel_x, td.accel_y, td.accel_z, td.t from test_data td join tests t where td.test_id = t.id and t.user_id =", completed_users[1,1])
+> 
+> suppressWarnings(testData<-dbGetQuery(mydb, query))
+> 
+> # see what the result looks like
+> head(testData)
+  user_id posture ordinal accel_x accel_y accel_z      t
+1      95 kinetic       1   -0.46   -0.36    9.71      0
+2      95 kinetic       1   -0.46   -0.38    9.75  19696
+3      95 kinetic       1   -0.29   -0.39    9.98  41547
+4      95 kinetic       1   -0.28   -0.39    9.91  61041
+5      95 kinetic       1   -0.45   -0.38    9.67  81822
+6      95 kinetic       1   -0.48   -0.38    9.75 103973
+> 
+> # Write the results to file in the accel.R's data input file
+> write.csv(testData, file = input_data_file, row.names = FALSE)
+> 
+> # Get the user data to go with it
+> query<-paste("select * from users u where u.id =", completed_users[1,1])
+> suppressWarnings(userData<-dbGetQuery(mydb, query))
+> 
+> # Write the results to file in the accel.R's user input file
+> write.csv(userData, file = input_user_file, row.names = FALSE)
+> 
+> # Now invoke accel.R to analyze the data and place the report in the output directory
+> # Ready to be swept up and sent to its final resting place on the next (or subsequent) run of this program.
+> # (This allows time for the analysis to run before we try to tidy up its results)
+> 
+> params = paste(input_data_file, input_user_file, output_directory)
+> print (params)
+[1] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/acceleration2.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/postUser.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/"
+> invoke = paste("Rscript accel.R ", params)
+> print (invoke)
+[1] "Rscript accel.R  /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/acceleration2.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/postUser.csv /home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/"
+> 
+> system(invoke, wait=FALSE)
+> dbDisconnect(mydb)
+[1] TRUE
+> 
+> 
+> args <- commandArgs(trailingOnly = TRUE)
+> # test if there is at least one argument: if not, return an error
+> if (length(args)!=3) {
++   stop("Three arguments must be supplied (input_data, input_user files and output directory).n", call.=FALSE)
++ }
+> print(args)
+[1] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/acceleration2.csv"
+[2] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/postUser.csv"     
+[3] "/home/prog/staging/tremorapp_server/analysis/R_working_dirctory/Data/"                 
+> 
+> input_data_file_path <- args[1]
+> input_user_file_path <- args[2]
+> output_file_folder <- args[3]
+> 
+> rm(args)
+> 
+> #example path...
+> #accelData <- read.csv("/Users/julian/Documents/Projects/Tremor/Data/acceleration2.csv", header=FALSE)
+> accelData <- read.csv(input_data_file_path, header=TRUE)
+> # Show what the acceleration data looks like
+> head(accelData)
+  user_id posture ordinal accel_x accel_y accel_z      t
+1      95 kinetic       1   -0.46   -0.36    9.71      0
+2      95 kinetic       1   -0.46   -0.38    9.75  19696
+3      95 kinetic       1   -0.29   -0.39    9.98  41547
+4      95 kinetic       1   -0.28   -0.39    9.91  61041
+5      95 kinetic       1   -0.45   -0.38    9.67  81822
+6      95 kinetic       1   -0.48   -0.38    9.75 103973
+> 
+> colnames(accelData)[colnames(accelData)=="accel_z"] <- "accelz"
+> 
+> head(accelData)
+  user_id posture ordinal accel_x accel_y accelz      t
+1      95 kinetic       1   -0.46   -0.36   9.71      0
+2      95 kinetic       1   -0.46   -0.38   9.75  19696
+3      95 kinetic       1   -0.29   -0.39   9.98  41547
+4      95 kinetic       1   -0.28   -0.39   9.91  61041
+5      95 kinetic       1   -0.45   -0.38   9.67  81822
+6      95 kinetic       1   -0.48   -0.38   9.75 103973
+> 
+> userData <- read.csv(input_user_file_path, header=TRUE)
+> # Show what the user data looks like
+> head(userData)
+  id first_name last_name gender pin        dob height weight city state
+1 95        vhu        gb      M   0 2016-06-28     23     56  Vhn    NL
+  ethnicity ET PD other tremor personal_email doctors_email research_org_email
+1     Asian  1  0    NA      1             NA     bkyf@by.b                 NA
+  test_complete acceleration_unit                         hash_key
+1             1                SI 02e74f10e0327ad868d138f2b4fdd6f0
+           created_at          updated_at
+1 2016-10-27 18:47:13 2016-10-27 18:51:52
+> 
+> # Get the user_id
+> user_id <- accelData[2,1]
+> 
+> # direct the output to our output file
+> output_file_path <- paste(output_file_folder, user_id, ".pdf", sep="")
+> 
+> pdf(output_file_path)
+> 
+> # draw a graph using our input data
+> plot(accelData$t, accelData$accelz)
+> title(paste("Acceleration, name = ", userData[1,2], userData[1,3]))
+> 
+> # delete the input file 
+> #file.remove(input_data_file_path)
+> #file.remove(input_user_file_path)
+> 

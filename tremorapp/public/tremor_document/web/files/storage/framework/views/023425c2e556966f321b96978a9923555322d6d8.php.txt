@@ -1,0 +1,13 @@
+ 
+
+<?php $__env->startSection('title', 'Unauthorised Access'); ?>
+
+
+<?php $__env->startSection('content'); ?>
+<div class="title">404</div>
+
+<div class="sub-header">
+    Unable to find the requested page. If you feel this is an error please email at <a href="#">support@mytremor.org</a>
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.err-layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

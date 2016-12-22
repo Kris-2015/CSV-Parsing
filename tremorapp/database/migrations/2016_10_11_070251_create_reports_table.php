@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+/**
+ * Migration file for create reports table
+ *
+ * @author: msfi-krishnadev
+ */
+class CreateReportsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('reports', function (Blueprint $table) {
+            $table->increments('id')->comment('primary key of the reports table');
+            $table->integer('user_id')->comment('foreign key of the users table');
+            $table->index('user_id');
+            $table->string('uri', 200)->comment('url of the users medical report');
+            $table->tinyInteger('report_status')->default('0')->comment('0-not send, 1-mailed, 2-downloaded');
+            $table->index('report_status');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('reports');
+    }
+}

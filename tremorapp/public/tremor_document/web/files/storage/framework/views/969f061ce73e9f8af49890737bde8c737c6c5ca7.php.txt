@@ -1,0 +1,13 @@
+ 
+
+<?php $__env->startSection('title', 'Try again later'); ?>
+
+
+<?php $__env->startSection('content'); ?>
+<div class="title">File not ready</div>
+
+<div class="sub-header">
+    Report is being generated. Please try again after some time.
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.err-layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
